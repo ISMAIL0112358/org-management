@@ -8,15 +8,18 @@ router = APIRouter()
 
 @router.post("/Org/create")
 def create_organization(payload: OrgCreate, current_user: dict = Depends(get_current_master_admin)):
+
     create_master_db()
-    db_name = f"org_{payload.organization_name.lower()}"
+
     if get_org_db_name(payload.organization_name):
         raise HTTPException(status_code=400, detail="Organization already exists")
 
     created_db_name = create_org_db(payload.organization_name, payload.email, payload.password, pwd_context)
 
+    from app.config import settings
+
     conn = psycopg2.connect(
-        dbname="masterdb", user="postgres", password="1234", host="localhost", port="5432"
+        dbname=settings.master_db_name, user=settings.master_db_user, password=settings.master_db_password, host=settings.master_db_host, port=settings.master_db_port
     )
     cur = conn.cursor()
     cur.execute("INSERT INTO organizations (name, db_name, admin_email) VALUES (%s, %s, %s)",

@@ -4,7 +4,10 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from alembic import context
-from sqlalchemy import engine_from_config
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -17,19 +20,14 @@ if config.config_file_name is not None:
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-from sqlalchemy import create_engine, MetaData
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-
-# This is the base for your models. You'll define your models inheriting from this.
-Base = declarative_base()
 from app.models import Base
 target_metadata = Base.metadata
 
 # Import your application's database configuration
-import os, sys
-sys.path.append(os.getcwd())
-from app.database import MASTER_DB_CONFIG
+import os
+
+# Import your application's database configuration
+# from app.database import MASTER_DB_CONFIG # No longer needed here
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
@@ -38,17 +36,7 @@ from app.database import MASTER_DB_CONFIG
 
 
 def run_migrations_offline() -> None:
-    """Run migrations in 'offline' mode.
 
-    This configures the context with just a URL
-    and not an Engine, though an Engine is acceptable
-    here as well.  By skipping the Engine creation
-    we don't even need a DBAPI to be available.
-
-    Calls to context.execute() here emit the given string to the
-    script output.
-
-    """
     url = config.get_main_option("sqlalchemy.url")
     context.configure(
         url=url,
@@ -68,8 +56,20 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
+    # Use environment variables to construct the database URL
+    db_user = os.environ.get("MASTER_DB_USER")
+    db_password = os.environ.get("MASTER_DB_PASSWORD")
+    db_host = os.environ.get("MASTER_DB_HOST")
+    db_port = os.environ.get("MASTER_DB_PORT")
+    db_name = os.environ.get("MASTER_DB_NAME")
+
+    db_url = f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
+
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
+        {
+            "sqlalchemy.url": db_url,
+            "sqlalchemy.echo": "False" # Set to True for verbose SQL logging
+        },
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )

@@ -7,3 +7,7 @@ uvicorn
 PyJWT
 alembic
 SQLAlchemy
+python-dotenv
+pydantic-settings
+email-validator
+python-multipart

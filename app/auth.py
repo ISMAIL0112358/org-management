@@ -3,7 +3,9 @@ from fastapi.security import OAuth2PasswordBearer
 from fastapi import Depends, HTTPException, status
 import jwt
 
-SECRET_KEY = "your_jwt_secret"
+from app.config import settings
+
+SECRET_KEY = settings.secret_key
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="admin/login")
 

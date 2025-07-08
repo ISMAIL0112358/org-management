@@ -1,14 +1,14 @@
 import psycopg2
 from psycopg2 import sql
-import os
+from app.config import settings
 
 # Postgres connection settings
 MASTER_DB_CONFIG = {
-    "dbname": "masterdb",
-    "user": "postgres",
-    "password": "1234",
-    "host": "localhost",
-    "port": "5432"
+    "dbname": settings.master_db_name,
+    "user": settings.master_db_user,
+    "password": settings.master_db_password,
+    "host": settings.master_db_host,
+    "port": settings.master_db_port
 }
 
 def get_master_conn():
@@ -51,7 +51,7 @@ def create_org_db(name: str, email: str, password: str, pwd_context):
     
     # Connect to the default 'postgres' database to create the new organization database
     temp_conn = psycopg2.connect(
-        dbname="postgres", user="postgres", password="1234", host="localhost", port="5432"
+        dbname="postgres", user=settings.master_db_user, password=settings.master_db_password, host=settings.master_db_host, port=settings.master_db_port
     )
     temp_conn.autocommit = True
     temp_cur = temp_conn.cursor()
@@ -65,7 +65,7 @@ def create_org_db(name: str, email: str, password: str, pwd_context):
 
     # Connect to the newly created organization database to set up the admin table
     org_conn = psycopg2.connect(
-        dbname=db_name, user="postgres", password="1234", host="localhost", port="5432"
+        dbname=db_name, user=settings.master_db_user, password=settings.master_db_password, host=settings.master_db_host, port=settings.master_db_port
     )
     cur = org_conn.cursor()
     cur.execute("""CREATE TABLE IF NOT EXISTS admin (

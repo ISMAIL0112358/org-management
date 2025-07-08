@@ -3,6 +3,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from app.database import get_org_db_name
 from app.auth import verify_password, create_access_token, pwd_context
 import psycopg2
+from app.config import settings
 
 router = APIRouter()
 
@@ -17,7 +18,7 @@ def admin_login(form_data: OAuth2PasswordRequestForm = Depends()):
         raise HTTPException(status_code=404, detail="Organization not found")
 
     org_conn = psycopg2.connect(
-        dbname=db_name, user="postgres", password="1234", host="localhost", port="5432"
+        dbname=db_name, user=settings.master_db_user, password=settings.master_db_password, host=settings.master_db_host, port=settings.master_db_port
     )
     cur = org_conn.cursor()
     cur.execute("SELECT hashed_password FROM admin WHERE email=%s", (form_data.username,))

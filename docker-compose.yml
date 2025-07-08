@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: ${MASTER_DB_NAME}
+      POSTGRES_USER: ${MASTER_DB_USER}
+      POSTGRES_PASSWORD: ${MASTER_DB_PASSWORD}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432" # Optional: Expose DB port to host for external tools (like DBeaver)
+
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      SECRET_KEY: ${SECRET_KEY}
+      MASTER_DB_NAME: ${MASTER_DB_NAME}
+      MASTER_DB_USER: ${MASTER_DB_USER}
+      MASTER_DB_PASSWORD: ${MASTER_DB_PASSWORD}
+      MASTER_DB_HOST: db # Connect to the 'db' service within the Docker network
+      MASTER_DB_PORT: ${MASTER_DB_PORT}
+    depends_on:
+      - db
+    volumes:
+      - .:/app # Mount your project directory for live code changes (useful for development)
+
+volumes:
+  pg_data:
