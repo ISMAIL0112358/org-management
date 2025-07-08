@@ -138,24 +138,12 @@ To run this application using Docker, follow these steps:
 
     ```bash
     docker-compose up --build
+    docker-compose exec app alembic upgrade head
     ```
     This command will:
     *   Build the Docker image for your application (if it's not already built or if changes are detected).
     *   Start the PostgreSQL database service.
     *   Start your FastAPI application service.
     *   Create a network for the services to communicate.
+    *   Create the database schema using Alembic migrations.
 
-3.  **Access the API:**
-    Once the containers are running, the API will be accessible at `http://localhost:8000`.
-
-    You can then use the `curl` commands provided in the "API Overview and Journey" section to test the endpoints.
-
-**Important Notes:**
-
-*   **Database Persistence:** The `pg_data` volume in `docker-compose.yml` ensures that your PostgreSQL data persists even if you stop and restart the containers. This means your organizations and master admin data will not be lost.
-*   **Stopping Containers:** To stop the running containers, press `Ctrl+C` in the terminal where `docker-compose up` is running. To stop and remove the containers, networks, and volumes (but keep `pg_data` volume by default), run `docker-compose down`.
-*   **Database Migrations:** After starting the services for the first time, you will need to run Alembic migrations to set up your database schema. You can do this by executing the migration command within the running `app` container:
-    ```bash
-    docker-compose exec app alembic upgrade head
-    ```
-    This command will apply all pending migrations to your PostgreSQL database running in the `db` container.
