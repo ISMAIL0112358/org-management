@@ -36,18 +36,20 @@ import os
 
 
 def run_migrations_offline() -> None:
-
-    url = config.get_main_option("sqlalchemy.url")
+    db_user = os.environ.get("MASTER_DB_USER")
+    db_password = os.environ.get("MASTER_DB_PASSWORD")
+    db_host = os.environ.get("MASTER_DB_HOST")
+    db_port = os.environ.get("MASTER_DB_PORT")
+    db_name = os.environ.get("MASTER_DB_NAME")
+    db_url = f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
     context.configure(
-        url=url,
+        url=db_url,
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
     )
-
     with context.begin_transaction():
         context.run_migrations()
-
 
 def run_migrations_online() -> None:
     """Run migrations in 'online' mode.
